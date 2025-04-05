@@ -14,7 +14,8 @@ app = Flask(__name__)
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config["SQLALCHEMY_DATABASE_URI"] = ENGINE
 app.config['SESSION_COOKIE_NAME'] = 'vhub'
-app.config['SECRET_KEY'] = token_hex()
+# app.config['SECRET_KEY'] = token_hex()
+app.config['SECRET_KEY'] = '111'
 
 app.register_blueprint(administrator, url_prefix='/admin')
 app.register_blueprint(api, url_prefix='/api')
@@ -121,7 +122,7 @@ async def login():
             flash('Empty input fields.')
             LOGER.info(
                 f'{login.__name__}(): Empty fields form <Email or name>: "{request.form["email-name"]}" or password: *****. '
-                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
         user = exists_user(request.form['email-name'])
@@ -129,27 +130,27 @@ async def login():
             flash('Invalid user.')
             LOGER.info(
                 f'{login.__name__}(): user "{request.form["email-name"]}" not found. '
-                f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
+                # f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
                 )
             return render_template('login.html')
         if not user.check_password(request.form['password']):
             flash('Invalid password.')
             LOGER.info(
                 f'{login.__name__}(): invalid password for user "{request.form["email-name"]}". '
-                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
         if user.blocked:
             flash('User <{0}> blocked.'.format(user.name))
             LOGER.info(
                 f'{login.__name__}(): try to log in a blocked user "{request.form["email-name"]}". '
-                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
         login_user(user)
         LOGER.info(
             f'{login.__name__}(): user "{request.form["email-name"]}" is logged on. '
-            f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+            # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
             )
         return redirect(url_for('index'))
     return render_template('login.html')
@@ -160,7 +161,7 @@ async def login():
 async def logout():
     LOGER.info(
         f'{logout.__name__}(): user "{current_user.name}" logout. '
-        f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
+        # f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
         )
     logout_user()
     return redirect(url_for('login'))
