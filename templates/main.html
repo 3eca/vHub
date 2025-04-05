@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .content {
+                height: 100vh;
+                position: relative;
+                top: 56px;
+                background-color: #afafaf;
+            }
+        </style>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/40X.css') }}">
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <title>vHub</title>
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{{ url_for('index') }}">vHub</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            {% block admin_menu %}{% endblock %}
+                            {% block menu %}{% endblock %}
+                        </ul>
+                        {% block logout %}{% endblock %}
+                    </div>
+                </div>
+            </nav>
+        </header>
+        {% block admin_admin %}{% endblock %}
+        {% block admin_tables %}{% endblock %}
+        {% block admin_modal_add_user %}{% endblock %}
+        {% block admin_modal_gp %}{% endblock %}
+
+        {% block video_list %}{% endblock %}
+        {% block user_video %}{% endblock %}
+
+        {% block login %}{% endblock %}
+        {% block index %}{% endblock %}
+        {% block error %}{% endblock %}
+
+        {% block modal_user_access %}{% endblock %}
+        {% block modal_user_edit %}{% endblock %}
+        {% block modal_upload %}{% endblock %}
+        {% block modal_multiupload %}{% endblock %}
+        {% block modal_video_edit %}{% endblock %}
+
+        {% block gp_info %}{% endblock %}
+
+        {% block play_video %}{% endblock %}
+    </body>
+</html>

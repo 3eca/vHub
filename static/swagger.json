@@ -1,0 +1,502 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "vHub API",
+    "version": "1.0.0",
+    "description": "API for managing videos, users, groups, and playlists."
+  },
+  "tags": [
+    {
+      "name": "Video",
+      "description": "Operations related to video management."
+    },
+    {
+      "name": "User",
+      "description": "Operations related to user management."
+    },
+    {
+      "name": "Group",
+      "description": "Operations related to group management."
+    },
+    {
+      "name": "Playlist",
+      "description": "Operations related to playlist management."
+    }
+  ],
+  "paths": {
+    "/api/video/edit": {
+      "post": {
+        "tags": ["Video"],
+        "summary": "Edit video data",
+        "description": "Update video name or access permissions. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "videoName": {
+                    "type": "string",
+                    "description": "New name for the video."
+                  },
+                  "link": {
+                    "type": "string",
+                    "description": "Video link to update."
+                  },
+                  "on": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "group-X|playlist-X to enable access. Where X=ID group|playlist."
+                    }
+                  },
+                  "off": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "group-X|playlist-X to disable access. Where X=ID group|playlist."
+                    }
+                  }
+                }
+              },
+              "example": {
+                "videoName": "New Video Name",
+                "link": "e09fcf68-48c6-4b0f-ad62-e6a968a1fd55.mp4",
+                "on": ["group-1", "playlist-1"],
+                "off": ["group-2", "playlist-2"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/video/share": {
+      "post": {
+        "tags": ["Video"],
+        "summary": "Share video without authorization",
+        "description": "Enable or disable public access to a video. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "videoLink": {
+                    "type": "string",
+                    "description": "Video link to share."
+                  },
+                  "state": {
+                    "type": "boolean",
+                    "description": "Enable or disable sharing."
+                  }
+                },
+                "required": ["videoLink", "state"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "tags": ["Video"],
+        "summary": "Upload a video",
+        "description": "Upload a video file. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "binary",
+                    "description": "Video file."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Empty file or invalid format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/group/add": {
+      "post": {
+        "tags": ["Group"],
+        "summary": "Add a group",
+        "description": "Create a new group. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the group."
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/playlist/add": {
+      "post": {
+        "tags": ["Playlist"],
+        "summary": "Add a playlist",
+        "description": "Create a new playlist. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the playlist."
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/add": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Add a user",
+        "description": "Create a new user. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "User's name."
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "User's email."
+                  },
+                  "pwd": {
+                    "type": "string",
+                    "description": "User's password (optional)."
+                  }
+                },
+                "required": ["name", "email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing or invalid data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/access": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Set or revoke user access",
+        "description": "Modify user access permissions. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "integer",
+                    "description": "User ID."
+                  },
+                  "on": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "group-X|playlist-X to enable access. Where X=ID group|playlist."
+                    }
+                  },
+                  "off": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "group-X|playlist-X to disable access. Where X=ID group|playlist."
+                    }
+                  }
+                },
+                "required": ["user"]
+              },
+              "example": {
+                "user": "2",
+                "on": ["group-1", "playlist-1"],
+                "off": ["group-2", "playlist-2"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/state": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Ban or unban a user",
+        "description": "Change the state of a user. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "integer",
+                    "description": "User ID."
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "User's name."
+                  },
+                  "state": {
+                    "type": "boolean",
+                    "description": "Ban or unban state."
+                  }
+                },
+                "required": ["userID", "userName", "state"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/admin": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Set or revoke administrator access",
+        "description": "Grant or revoke admin privileges for a user. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "integer",
+                    "description": "User ID."
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "User's name."
+                  },
+                  "state": {
+                    "type": "boolean",
+                    "description": "Admin state."
+                  }
+                },
+                "required": ["userID", "userName", "state"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/set-password": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Set a user password",
+        "description": "Set a new password for a user. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "integer",
+                    "description": "User ID."
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "User's name."
+                  },
+                  "userPwd": {
+                    "type": "string",
+                    "description": "New password."
+                  }
+                },
+                "required": ["userID", "userName", "userPwd"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/user/reset-password": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Reset a user password",
+        "description": "Reset a user's password and send an email with the new password. Required cookie.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userID": {
+                    "type": "integer",
+                    "description": "User ID."
+                  },
+                  "userName": {
+                    "type": "string",
+                    "description": "User's name."
+                  },
+                  "userEmail": {
+                    "type": "string",
+                    "description": "User's email."
+                  },
+                  "state": {
+                    "type": "boolean",
+                    "description": "Reset state."
+                  }
+                },
+                "required": ["userID", "userName", "userEmail", "state"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Missing data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  }
+}

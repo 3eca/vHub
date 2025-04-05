@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .content {
+                height: 100vh;
+                position: relative;
+                top: 56px;
+                background-color: #afafaf;
+            }
+        </style>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/40X.css') }}">
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.slim.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <title>vHub</title>
+    </head>
+    <body>
+        <form action="/login" method="POST">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                        <div class="card shadow-2-strong bg-dark" style="border-radius: 1rem;">
+                            <div class="card-body p-5 text-center">
+                                <h3 class="mb-5 text-white">Sign in</h3>
+                                <div class="form-floating mb-4">
+                                    <input type="text" id="email-name" class="form-control form-control-lg" placeholder="name@example.com" name="email-name">
+                                    <label class="form-label" for="email-name">Email or name</label>
+                                </div>
+                                <div class="form-floating mb-4">
+                                    <input type="password" id="password" class="form-control form-control-lg" placeholder="Password" name="password">
+                                    <label class="form-label" for="password">Password</label>
+                                </div>
+                                    <button class="btn btn-outline-light btn-lg btn-block" type="submit">Login</button>
+                                {% for message in get_flashed_messages() %}
+                                <div class="text-white"><br>{{ message }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>

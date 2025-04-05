@@ -1,0 +1,5 @@
+*.todo
+.gitignore
+.git
+.vscode
+docker

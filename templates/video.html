@@ -1,0 +1,215 @@
+{% extends "main.html" %}
+{% block menu %}
+{% if admin %}
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ url_for('admin.root') }}' ; ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-arms-up" viewBox="0 0 16 16">
+            <path d="M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+            <path d="m5.93 6.704-.846 8.451a.768.768 0 0 0 1.523.203l.81-4.865a.59.59 0 0 1 1.165 0l.81 4.865a.768.768 0 0 0 1.523-.203l-.845-8.451A1.5 1.5 0 0 1 10.5 5.5L13 2.284a.796.796 0 0 0-1.239-.998L9.634 3.84a.7.7 0 0 1-.33.235c-.23.074-.665.176-1.304.176-.64 0-1.074-.102-1.305-.176a.7.7 0 0 1-.329-.235L4.239 1.286a.796.796 0 0 0-1.24.998l2.5 3.216c.317.316.475.758.43 1.204Z"/>
+        </svg>
+        Admin
+    </button>
+</li>
+<li class="nav-item">
+    <span>|</span>
+</li>
+{% endif %}
+{% if owner or admin %}
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#edit-video">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+        </svg>
+        Edit
+    </button>
+</li>
+<li class="nav-item">
+    <span>|</span>
+</li>
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-light" onclick="shareVideo(true)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
+          </svg>
+        Share
+    </button>
+</li>
+{% endif %}
+{% endblock %}
+{% block logout %}
+{% if not anonymous %}
+<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <li class="nav-item">
+        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ url_for('logout') }}' ; ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+            </svg>
+            Logout
+        </button>
+    </li>
+</ul>
+{% endif %}
+{% endblock %}
+{% block modal_video_edit %}
+<div class="modal fade" id="edit-video" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit-video" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="edit-video" enctype=multipart/form-data>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="edit-video">Edit video: {{data.name}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control form-control-sm fs-4" id="set-name" disabled>
+                        <label for="set-name" class="form-label">Name</label>
+                    </div>
+                    <div class="form-check d-flex justify-content-start mb-4">
+                        <input class="form-check-input name" type="checkbox" id="flexCheckDefault" onclick="changeState(this)">
+                        <label class="form-check-label" for="flexCheckDefault">Set new name</label>
+                    </div>
+                    <p></p>
+                    <p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccessGroups" aria-expanded="false" aria-controls="collapseAccessGroups">
+                        Groups
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapseAccessGroups">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enabled in data.groups.enabled %}
+                                <tr>
+                                    <td><input class="form-check-input group" type="checkbox" value="group-{{enabled[0]}}" id="flexCheckChecked" checked onclick="changeState(this)"></td>
+                                    <td>{{enabled[0]}}</td>
+                                    <td>{{enabled[1]}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for disabled in data.groups.disabled %}
+                                <tr>
+                                    <td><input class="form-check-input group" type="checkbox" value="group-{{disabled[0]}}" id="flexCheckDefault" onclick="changeState(this)"></td>
+                                    <td>{{disabled[0]}}</td>
+                                    <td>{{disabled[1]}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAccessPlaylists" aria-expanded="false" aria-controls="collapseAccessPlaylists">
+                        Playlists
+                        </button>
+                    </p>
+                    <div class="collapse" id="collapseAccessPlaylists">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enabled in data.playlists.enabled %}
+                                <tr>
+                                    <td><input class="form-check-input playlist" type="checkbox" value="playlist-{{enabled[0]}}" id="flexCheckChecked" checked onclick="changeState(this)"></td>
+                                    <td>{{enabled[0]}}</td>
+                                    <td>{{enabled[1]}}</td>
+                                </tr>
+                                {% endfor %}
+                                {% for disabled in data.playlists.disabled %}
+                                <tr>
+                                    <td><input class="form-check-input playlist" type="checkbox" value="playlist-{{disabled[0]}}" id="flexCheckDefault" onclick="changeState(this)"></td>
+                                    <td>{{disabled[0]}}</td>
+                                    <td>{{disabled[1]}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" onclick="editVideo()">Confirm</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onClick="window.location.href=window.location.href">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block play_video %}
+<div class="video-info" id="{{data.link}}">
+    <section class="h-100 gradient-custom-2">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <h1 style="word-break: break-all;" id="video-name">{{data.name}}</h1>
+                <video width="848" height="480" controls controlsList="nodownload">
+                    <source src="{{video}}" type="video/mp4">
+                    <source src="{{video}}" type="video/avi">
+                    <source src="{{video}}" type="video/mkv">
+                    <source src="{{video}}" type="video/mov">
+                    <source src="{{video}}" type="video/flv">
+                    Your browser does not support the video tag.
+                </video>
+                {% if not anonymous %}
+                <div class="row">
+                    <div class="col">
+                        <h3>Uploaded by: {{data.owner}}</h3>
+                            <p>{{data.date}}</p>
+                    </div>
+                    {% if data.expiry_share %}
+                    <div class="col">
+                        <h4>Expiry share:</h4>
+                            <p>{{data.expiry_share}}</p>
+                            {% if owner or admin %}
+                            <button type="button" class="btn btn-dark" onclick="shareVideo(false)">Stop share</button>
+                            {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <h4>Groups:</h4>
+                        {% for group in data.video_groups %}
+                        {% if group[-1] %}
+                        <a href="{{ url_for('group_info', _id=group[0]) }}" class="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                            <h6>{{group[-1]}}</h6>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <h4>Playlists:</h4>
+                        {% for playlist in data.video_playlists %}
+                        {% if playlist[-1] %}
+                        <a href="{{ url_for('playlist_info', _id=playlist[0]) }}" class="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                            <h6>{{playlist[-1]}}</h6>
+                        </a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var enableCheckbox = document.getElementById('flexCheckDefault');
+        var formControl = document.getElementById('set-name');
+        
+        enableCheckbox.addEventListener('change', function() {
+            formControl.disabled = !this.checked;
+        });
+    });
+</script>
+{% endblock %}

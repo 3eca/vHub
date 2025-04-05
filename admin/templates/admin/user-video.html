@@ -1,0 +1,118 @@
+{% extends "main.html" %}
+{% block menu %}
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ url_for('admin.root') }}' ; ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-arms-up" viewBox="0 0 16 16">
+            <path d="M8 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+            <path d="m5.93 6.704-.846 8.451a.768.768 0 0 0 1.523.203l.81-4.865a.59.59 0 0 1 1.165 0l.81 4.865a.768.768 0 0 0 1.523-.203l-.845-8.451A1.5 1.5 0 0 1 10.5 5.5L13 2.284a.796.796 0 0 0-1.239-.998L9.634 3.84a.7.7 0 0 1-.33.235c-.23.074-.665.176-1.304.176-.64 0-1.074-.102-1.305-.176a.7.7 0 0 1-.329-.235L4.239 1.286a.796.796 0 0 0-1.24.998l2.5 3.216c.317.316.475.758.43 1.204Z"/>
+        </svg>
+        Admin
+    </button>
+</li>
+<li class="nav-item">
+    <span>|</span>
+</li>
+<li class="nav-item">
+    <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ url_for('admin.users') }}' ; ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1L7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002-.014.002zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7 7 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.24 2.24 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.5 5.5 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+        </svg>
+        Users
+    </button>
+</li>
+<li class="nav-item">
+    <span>|</span>
+</li>
+{% endblock %}
+{% block logout %}
+<ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+    <li class="nav-item">
+        <form class="d-flex" action="/admin/user/{{_id}}/video" method="POST">
+            <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="search">
+            <button class="btn btn-outline-light" type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>
+            </button>
+        </form>
+    </li>
+    <li class="nav-item">
+        <span>|</span>
+    </li>
+    <li class="nav-item">
+        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ url_for('logout') }}' ; ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+            </svg>
+            Logout
+        </button>
+    </li>
+</ul>
+{% endblock %}
+{% block user_video %}
+<div class="user-video">
+    <section class="h-100 gradient-custom-2">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col col-lg-9 col-xl-7 flex-grow-1">
+                    <div class="card">
+                        <div class="rounded-top text-white d-flex flex-row bg-dark">
+                            <div class="ms-3" style="margin-top: 50px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4" style="background-color: #f8f9fa;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="row row-cols-xl-5 row-cols-lg-4 row-cols-md-3 g-4">
+                                {% for video in data %}
+                                <div class="col">
+                                    <div class="card h-100">
+                                        <a href="{{ url_for('play_video', link=video.link if video.link else video[4]) }}" class="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                                            <img src="/{{video.frame|valid_frame if video.frame else video[3]|valid_frame}}" width="150" height="200" class="card-img-top" alt="" id="{{video.link if video.link else video[4]}}" loading="lazy" style="max-inline-size: 100%; block-size: auto;  object-fit: contain;">
+                                        </a>
+                                        <div class="card-body">
+                                            <p class="card-text text-center">
+                                                <a href="{{ url_for('play_video', link=video.link or video[4]) }}" class="link-dark link-offset-2 link-underline link-underline-opacity-0">
+                                                    {{video.name|truncate_name if video.name else video[1]|truncate_name}}
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            {% for page in data.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                {% if page %}
+                                    {% if page == data.page %}
+                                        <li class="page-item">
+                                            <a class="page-link">{{page}}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            {% if search %}
+                                            <a class="page-link" href="{{ url_for('admin.user_video', _id=_id, search=search, page=page) }}">{{page}}</a>
+                                            {% else %}
+                                            <a class="page-link" href="{{ url_for('admin.user_video', _id=_id, page=page) }}">{{page}}</a>
+                                            {% endif %}
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link">...</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        <p>Total: {{data.total}}</p>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

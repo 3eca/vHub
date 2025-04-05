@@ -1,0 +1,9 @@
+{% extends "main.html" %}
+{% block error %}
+<div class="error-page">
+    <p id="visual">{{data.code}}</p>
+</div>
+<div class="error-message">
+    <p>{{data.message}}</p>
+</div>
+{% endblock %}
