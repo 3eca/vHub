@@ -13,6 +13,7 @@
 - Добавление пользователей\видео в "Groups" и "Playlists".
 - Скрипт удаления видео remove_video.py.
 - Swagger доступен на /swagger.
+- LDAP.
 
 ## Docker-compose
 
@@ -35,7 +36,7 @@ server {
   client_max_body_size 0;
   server_tokens off;
 
-  set $app 172.28.1.2:3000;
+  set $app 172.28.1.4:3000;
   set $minio 172.28.1.3:9000;
 
   ignore_invalid_headers off;
@@ -78,7 +79,7 @@ server {
   client_max_body_size 0;
   server_tokens off;
 
-  set $app 172.28.1.2:3000;
+  set $app 172.28.1.4:3000;
   set $minio 172.28.1.3:9000;
 
   ignore_invalid_headers off;
@@ -108,70 +109,6 @@ server {
   }
 }
 ```
-
-## Environment
-
-Для приложения доступны переменные окружения.
-
-Значения по умолчанию:
-
-- VHUB_SHARED_VIDEO=false
-- VHUB_SHARED_VIDEO_TIME=7
-- VHUB_EMAIL=false
-- VHUB_ADMIN_NAME=admin
-- VHUB_ADMIN_PWD=vhub
-- VHUB_MINIO_USER=vhub-minio
-- VHUB_MINIO_PWD=vhub-minio
-- VHUB_MINIO_PORT=9000
-- VHUB_MINIO_BUCKET=vhub
-- VHUB_MINIO_SRV=172.28.1.3
-- VHUB_MYSQL_SRV=172.28.1.4
-- VHUB_MYSQL_USER=root
-- VHUB_MYSQL_PWD=vhub-mysql
-- VHUB_MYSQL_PORT=3306
-- VHUB_MYSQL_DB=vhub
-- VHUB_SMTP_SRV=""
-- VHUB_SMTP_PORT=""
-- VHUB_SMTP_USER=""
-- VHUB_SMTP_PWD=""
-
-**VHUB_SHARED_VIDEO** - Возможность поделиться видеофайлом (в том числе для не зарегистрированных пользователей).
-
-**VHUB_SHARED_VIDEO_TIME** - Временной отрезок предоставляющий общий доступ к видео файлу.
-
-**VHUB_EMAIL** - Доступность функционала электронный почты (отправка\сброс паролей пользователей).
-
-**VHUB_ADMIN_NAME** - Имя админа.
-
-**VHUB_ADMIN_PWD** - Пароль админа.
-
-**VHUB_MINIO_USER** - Соответствие MINIO_ROOT_USER в docker-compose.yml.
-
-**VHUB_MINIO_PWD** - Соответствие MINIO_ROOT_PWD в docker-compose.yml.
-
-**VHUB_MINIO_PORT** - Minio порт(по умолчанию - 9000).
-
-**VHUB_MINIO_BUCKET** - Соответствие MINIO_DEFAULT_BUCKETS в docker-compose.yml.
-
-**VHUB_MINIO_SRV** - Соответствие ip адресу Minio в docker-compose.yml.
-
-**VHUB_MYSQL_SRV** - Соответствие ip адресу MySQL в docker-compose.yml.
-
-**VHUB_MYSQL_USER** - MySQL пользователь(по умолчанию - root).
-
-**VHUB_MYSQL_PWD** - Соответствие MYSQL_ROOT_PASSWORD в docker-compose.yml.
-
-**VHUB_MYSQL_PORT** - MySQL порт(по умолчанию - 3306).
-
-**VHUB_MYSQL_DB** - Генерация новой базы данных с заданным именем.
-
-**VHUB_SMTP_SRV** - Адрес smtp сервера(по умолчанию - "").
-
-**VHUB_SMTP_PORT** - Порт smtp сервера(по умолчанию - "").
-
-**VHUB_SMTP_USER** - Пользователь smtp сервера(по умолчанию - "").
-
-**VHUB_SMTP_PWD** - Пароль пользователя smtp сервера(по умолчанию - "").
 
 ## Сборка Docker образа
 

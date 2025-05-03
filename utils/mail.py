@@ -1,6 +1,6 @@
 import smtplib
-from os import environ, path
 import utils.logs as logs
+from .database import config, path
 
 
 LOGER = logs.get_logger(path.basename(__file__))
@@ -10,7 +10,7 @@ def send_email(recipient: str, passwd: str) -> bool:
     """
     Send email
     """
-    body = f"From: {environ['VHUB_SMTP_USER']}\n" \
+    body = f"From: {config['Email']['user']}\n" \
            f"To: {recipient}\n" \
            "Subject: Reseted password to vHub\n" \
            "MIME-Version: 1.0\n" \
@@ -19,12 +19,14 @@ def send_email(recipient: str, passwd: str) -> bool:
            f"Your new password {passwd}"
               
     try:
-        smtp = smtplib.SMTP(environ['VHUB_SMTP_SRV'], int(environ['VHUB_SMTP_PORT']))
+        if not config['Email'].getboolean('email'):
+            raise Exception('Option disable.')
+        smtp = smtplib.SMTP(config['Email']['host'], config['Email'].getint('port'))
         smtp.starttls()
         smtp.ehlo()
-        smtp.login(environ['VHUB_SMTP_USER'], environ['VHUB_SMTP_PWD'])
+        smtp.login(config['Email']['user'], config['Email']['password'])
         smtp.sendmail(
-            environ['VHUB_SMTP_USER'],
+            config['Email']['user'],
             recipient,
             body.encode('utf-8')
             )

@@ -34,6 +34,11 @@
                                 <div class="form-floating mb-4">
                                     <input type="password" id="password" class="form-control form-control-lg" placeholder="Password" name="password">
                                     <label class="form-label" for="password">Password</label>
+                                <br>
+                                <div class="form-check d-inline-block">
+                                    <input type="checkbox" class="form-check-input" id="ldap-auth" name="ldap-auth">
+                                    <label class="form-check-label text-white" for="ldap-auth">LDAP</label>
+                                </div>
                                 </div>
                                     <button class="btn btn-outline-light btn-lg btn-block" type="submit">Login</button>
                                 {% for message in get_flashed_messages() %}

@@ -1,7 +1,7 @@
 import app as app
 from socket import socket, AF_INET, SOCK_DGRAM
 import utils.logs as logs
-from os import path
+from app import path
 
 
 LOGER = logs.get_logger(path.basename(__file__))
@@ -16,6 +16,5 @@ if __name__ == '__main__':
     LOGER.info('vHub app started.')
     app.app.run(
         host=laddr,
-        port=3000,
-        debug=True
+        port=3000
     )

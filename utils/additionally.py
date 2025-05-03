@@ -93,8 +93,8 @@ def user_data(user_id: int) -> dict:
     user = get_full_user(user_id)
     groups = get_short_gp(Groups)
     playlists = get_short_gp(Playlists)
-    user_groups = set(row[6:8] for row in user)
-    user_playlists = set(row[8:10] for row in user)
+    user_groups = set(row[7:9] for row in user)
+    user_playlists = set(row[9:11] for row in user)
     user_groups_sort = intersection(user_groups, groups)
     user_playlists_sort = intersection(user_playlists, playlists)
     if user:
@@ -104,11 +104,12 @@ def user_data(user_id: int) -> dict:
         data['date'] = user[0][3]
         data['blocked'] = user[0][4]
         data['admin'] = user[0][5]
+        data['ldap'] = user[0][6]
         data['user_groups'] = user_groups
         data['user_playlists'] = user_playlists
         data['groups'] = juxtaposition(groups, user_groups_sort)
         data['playlists'] = juxtaposition(playlists, user_playlists_sort)
-        data['count_videos'] = 0 if user[0][-1] is None else len(set(row[10:] for row in user))
+        data['count_videos'] = 0 if user[0][-1] is None else len(set(row[11:] for row in user))
     return data
 
 

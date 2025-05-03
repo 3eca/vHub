@@ -140,6 +140,7 @@ class Users(db.Model, UserMixin):
     blocked = db.Column(db.Boolean, default=False, nullable=False)
     passwd = db.Column(db.String(255))
     admin = db.Column(db.Boolean, default=False, nullable=False)
+    ldap = db.Column(db.Boolean, default=False)
     groups = db.relationship('GroupsUser', backref='users', cascade='all, delete-orphan')
     playlists = db.relationship('PlaylistsUser', backref='users', cascade='all, delete-orphan')
     videos = db.relationship('VideosUser', backref='users', cascade='all, delete-orphan')
@@ -151,8 +152,9 @@ class Users(db.Model, UserMixin):
             '<Name %r>, ' \
             '<Email %r>, ' \
             '<Date %r>, ' \
-            '<Blocked %r> ' \
-            '<Admin %r> ' \
+            '<Blocked %r>, ' \
+            '<Admin %r>, ' \
+            '<LDAP %r>, ' \
             '<Groups %r> ' 
                 ) % (
                     self.__tablename__,
@@ -162,6 +164,7 @@ class Users(db.Model, UserMixin):
                     self.date,
                     self.blocked,
                     self.admin,
+                    self.ldap,
                     self.groups
                     )
 

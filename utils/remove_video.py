@@ -1,5 +1,4 @@
-from os import environ, path
-
+from database import config, path
 import argparse
 from minio import Minio
 from minio.error import S3Error
@@ -49,11 +48,11 @@ class RMVideo():
 
     def __connect_to_db(self) -> pymysql.Connect:
         return pymysql.connect(
-            host=environ['VHUB_MYSQL_SRV'],
-            port=int(environ['VHUB_MYSQL_PORT']),
-            user=environ['VHUB_MYSQL_USER'],
-            passwd=environ['VHUB_MYSQL_PWD'],
-            database=environ['VHUB_MYSQL_DB'],
+            host=config['MySQL']['host'],
+            port=config['MySQL'].getint('port'),
+            user=config['MySQL']['user'],
+            passwd=config['MySQL']['password'],
+            database=config['MySQL']['database'],
             autocommit=True
         )
 
@@ -62,9 +61,9 @@ class RMVideo():
 
     def __connect_to_s3(self) -> Minio:
         return Minio(
-            endpoint=f"{environ['VHUB_MINIO_SRV']}:{environ['VHUB_MINIO_PORT']}",
-            access_key=environ['VHUB_MINIO_USER'],
-            secret_key=environ['VHUB_MINIO_PWD'],
+            endpoint=f"{config['Minio']['host']}:{config['Minio']['port']}",
+            access_key=config['Minio']['user'],
+            secret_key=config['Minio']['password'],
             secure=False
         )
 
@@ -89,8 +88,8 @@ class RMVideo():
             ''', (self._id,)
         )
         for s3_file in (vframe, vlink):
-            self.s3.remove_object(environ['VHUB_MINIO_BUCKET'], s3_file)
-            self.s3.remove_object(environ['VHUB_MINIO_BUCKET'], s3_file)
+            self.s3.remove_object(config['Minio']['bucket'], s3_file)
+            self.s3.remove_object(config['Minio']['bucket'], s3_file)
         LOGER.info(
             f'{self.__rm_single_video.__name__}(): Video ID "{self._id}" as "{vname}" has been removed by administrator.'
             )

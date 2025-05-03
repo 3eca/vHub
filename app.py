@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, flash, redirect, send_from_directory, url_for, abort
 from flask_login import LoginManager, login_required, login_user, current_user, logout_user
+from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
+from flask_migrate import Migrate
 from secrets import token_hex
 from utils import *
 from admin.admin import administrator
 from api.api import api
 from swagger.swagger import swagger
-from os import path
 
 
 LOGER = get_logger(path.basename(__file__))
@@ -14,8 +15,20 @@ app = Flask(__name__)
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
 app.config["SQLALCHEMY_DATABASE_URI"] = ENGINE
 app.config['SESSION_COOKIE_NAME'] = 'vhub'
-# app.config['SECRET_KEY'] = token_hex()
-app.config['SECRET_KEY'] = '111'
+app.config['SECRET_KEY'] = token_hex()
+
+if config['LDAP'].getboolean('ldap'):
+    app.config['LDAP_HOST'] = config['LDAP']['host']
+    app.config['LDAP_PORT'] = config['LDAP'].getint('port')
+    app.config['LDAP_BASE_DN'] = config['LDAP']['base_dn']
+    app.config['LDAP_USER_DN'] = config['LDAP']['user_dn']
+    app.config['LDAP_GROUP_OBJECT_FILTER'] = config['LDAP']['group_filter']
+    app.config['LDAP_USER_LOGIN_ATTR'] = config['LDAP']['user_login_attr']
+    app.config['LDAP_USER_OBJECT_FILTER'] = config['LDAP']['user_filter']
+    app.config['LDAP_BIND_USER_DN'] = config['LDAP']['bind_dn']
+    app.config['LDAP_BIND_USER_PASSWORD'] = config['LDAP']['bind_password']
+
+    ldap_manager = LDAP3LoginManager(app)
 
 app.register_blueprint(administrator, url_prefix='/admin')
 app.register_blueprint(api, url_prefix='/api')
@@ -23,10 +36,13 @@ app.register_blueprint(swagger, url_prefix='/swagger')
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+
 db.init_app(app)
 with app.app_context():
     db.create_all()
     defaults()
+migrate = Migrate(app, db)
 
 
 @app.template_filter('truncate_name')
@@ -122,35 +138,78 @@ async def login():
             flash('Empty input fields.')
             LOGER.info(
                 f'{login.__name__}(): Empty fields form <Email or name>: "{request.form["email-name"]}" or password: *****. '
-                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
+        
+        if request.form.get('ldap-auth') and config['LDAP'].getboolean('ldap'):
+            user = ldap_manager.authenticate(
+                username=request.form['email-name'],
+                password=request.form['password']
+            )
+            if user.status != AuthenticationResponseStatus.success:
+                flash('Invalid LDAP user.')
+                LOGER.error(
+                    f'{login.__name__}(): unknow LDAP user "{request.form["email-name"]}". '
+                    f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
+                )
+                return render_template('login.html')
+
+            allowed_group = f"{config['LDAP']['group_access']},{config['LDAP']['group_dn']},{config['LDAP']['base_dn']}"
+            if allowed_group in user.user_info[config['LDAP']['group_access_attr']]:
+                user_ldap = exists_user(request.form['email-name'])
+                if not user_ldap:
+                    new_user(
+                        name=user.user_info[config['LDAP']['user_login_attr']],
+                        email=user.user_info[config['LDAP']['user_email']],
+                        ldap=True
+                        )
+                login_user(exists_user(request.form['email-name']))
+                LOGER.info(
+                    f'{login.__name__}(): LDAP user "{request.form["email-name"]}" is logged on. '
+                    f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                    )
+                return redirect(url_for('index'))
+            else:
+                flash('Access denied.')
+                LOGER.error(
+                    f'{login.__name__}(): access denied for LDAP user "{request.form["email-name"]}". '
+                    f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                    )
+                return render_template('login.html')
+        elif request.form.get('ldap-auth') and not config['LDAP'].getboolean('ldap'):
+            flash('LDAP disable.')
+            return render_template('login.html')
+
         user = exists_user(request.form['email-name'])
         if not user:
             flash('Invalid user.')
             LOGER.info(
                 f'{login.__name__}(): user "{request.form["email-name"]}" not found. '
-                # f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
+                f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
                 )
             return render_template('login.html')
+        
         if not user.check_password(request.form['password']):
             flash('Invalid password.')
             LOGER.info(
                 f'{login.__name__}(): invalid password for user "{request.form["email-name"]}". '
-                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
+        
         if user.blocked:
             flash('User <{0}> blocked.'.format(user.name))
             LOGER.info(
-                f'{login.__name__}(): try to log in a blocked user "{request.form["email-name"]}". '
-                # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+                f'{login.__name__}(): try to loging a blocked user "{request.form["email-name"]}". '
+                f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
                 )
             return render_template('login.html')
+        
         login_user(user)
         LOGER.info(
             f'{login.__name__}(): user "{request.form["email-name"]}" is logged on. '
-            # f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
+            f'Remote addr: "{request.headers["X-Forwarded-For"]}".'
             )
         return redirect(url_for('index'))
     return render_template('login.html')
@@ -161,7 +220,7 @@ async def login():
 async def logout():
     LOGER.info(
         f'{logout.__name__}(): user "{current_user.name}" logout. '
-        # f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
+        f'Remote addr: "{request.headers["X-Forwarded-For"]}.'
         )
     logout_user()
     return redirect(url_for('login'))

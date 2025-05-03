@@ -4,15 +4,16 @@ from typing import Type
 from sys import modules
 from werkzeug.utils import secure_filename
 import datetime
-from os import environ, path
+from os import path
 import utils.logs as logs
+import configparser
 
 
 LOGER = logs.get_logger(path.basename(__file__))
-
-
-ENGINE = f"mysql+pymysql://{environ['VHUB_MYSQL_USER']}:{environ['VHUB_MYSQL_PWD']}@" \
-         f"{environ['VHUB_MYSQL_SRV']}/{environ['VHUB_MYSQL_DB']}?charset=utf8mb4"
+config = configparser.ConfigParser()
+config.read('config.ini')
+ENGINE = f"mysql+pymysql://{config['MySQL']['user']}:{config['MySQL']['password']}@" \
+         f"{config['MySQL']['host']}/{config['MySQL']['database']}?charset=utf8mb4"
 
 
 def create_db() -> None:
@@ -20,13 +21,13 @@ def create_db() -> None:
     Init database.
     """
     connect = pymysql.connect(
-        host=environ['VHUB_MYSQL_SRV'],
-        port=int(environ['VHUB_MYSQL_PORT']),
-        user=environ['VHUB_MYSQL_USER'],
-        passwd=environ['VHUB_MYSQL_PWD']
+        host=config['MySQL']['host'],
+        port=config['MySQL'].getint('port'),
+        user=config['MySQL']['user'],
+        passwd=config['MySQL']['password']
     )
     cursor = connect.cursor()
-    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {environ['VHUB_MYSQL_DB']}")
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS {config['MySQL']['database']}")
     connect.commit()
     connect.close()
 
@@ -55,15 +56,15 @@ def defaults() -> None:
     if not __check(Users, 'admin'):
         db.session.add_all([
             Users(
-            name=environ['VHUB_ADMIN_NAME'],
-            email=f"{environ['VHUB_ADMIN_NAME']}@localhost.vhub",
+            name=config['Default']['admin_name'],
+            email=f"{config['Default']['admin_name']}@localhost.vhub",
             admin=True,
-            passwd=Users.gen_password(environ['VHUB_ADMIN_PWD'])
+            passwd=Users.gen_password(config['Default']['admin_password'])
             ),
             GroupsUser(user_id=1, link_id=1),
             PlaylistsUser(user_id=1, link_id=1)])
         db.session.commit()
-        LOGER.info(f'{defaults.__name__}(): user "{environ["VHUB_ADMIN_NAME"]}" with role admin create.')
+        LOGER.info(f'{defaults.__name__}(): user "{config["Default"]["admin_name"]}" with role admin create.')
 
 
 def get_short_user(user_id: int):
@@ -81,6 +82,7 @@ def get_full_user(user_id: int):
             Users.date,
             Users.blocked,
             Users.admin,
+            Users.ldap,
             Groups.id.label('gid'),
             Groups.name.label('gn'),
             Playlists.id.label('pid'),
@@ -105,7 +107,7 @@ def get_short_gp(table: Type[SQLAlchemy]):
 
 def exists_user(login: str):
     """
-    Checking whether a user exists to log in
+    Checking whether a user exists to loging.
     """
     user_name = db.session.query(Users).filter(Users.name==login).first()
     user_email = db.session.query(Users).filter(Users.email==login).first()
@@ -152,6 +154,7 @@ def get_users(search: str='', page: int=1) -> Query:
             Users.date,
             Users.blocked,
             Users.admin,
+            Users.ldap,
             cte_v.c.counter_video.label('cv'),
             cte_g.c.counter_group.label('cg'),
             cte_p.c.counter_playlist.label('cp')
@@ -171,6 +174,7 @@ def get_users(search: str='', page: int=1) -> Query:
             Users.date,
             Users.blocked,
             Users.admin,
+            Users.ldap,
             cte_v.c.counter_video.label('cv'),
             cte_g.c.counter_group.label('cg'),
             cte_p.c.counter_playlist.label('cp')
@@ -301,7 +305,7 @@ def get_gp_video(
         )
 
 
-def new_user(name: str, email: str, pwd: str='') -> bool:
+def new_user(name: str, email: str, pwd: str='', ldap: bool=False) -> bool:
     """
     Create new user
     """
@@ -311,7 +315,7 @@ def new_user(name: str, email: str, pwd: str='') -> bool:
                 Users(name=name, email=email, passwd=Users.gen_password(passwd=pwd))
                 )
         else:
-            db.session.add(Users(name=name, email=email))
+            db.session.add(Users(name=name, email=email)) if not ldap else db.session.add(Users(name=name, email=email, ldap=ldap))
         db.session.commit()
         LOGER.info(f'{new_user.__name__}(): user "{name}" with email "{email}" create.')
         db.session.add_all([
@@ -350,7 +354,7 @@ def set_user_state(user_id: int, state: bool) -> bool | None:
     Ban|Unban user
     """
     user = get_short_user(user_id)
-    if user:
+    if user and not user.ldap:
         user.blocked = state
         db.session.commit()
         LOGER.info(f'{set_user_state.__name__}(): user "{user.name}" {"blocked" if state else "unblocked"}.')
@@ -526,9 +530,11 @@ def share_video(link: str, state: bool) -> bool:
     if not video:
         LOGER.info(f'{share_video.__name__}(): video ID "{link}" not found.')
         return False
-    if state:
-        video.expiry_share = datetime.datetime.now() + datetime.timedelta(days=int(environ['VHUB_SHARED_VIDEO_TIME']))
+    if state and config['Video'].getboolean('shared'):
+        video.expiry_share = datetime.datetime.now() + datetime.timedelta(days=config['Video'].getint('time'))
         LOGER.info(f'{share_video.__name__}(): video "{video.name}" with link "{video.link.split(".")[0]}" sharring.')
+    if state and not config['Video'].getboolean('shared'):
+        return False
     else:
         video.expiry_share = None
         LOGER.info(f'{share_video.__name__}(): video "{video.name}" with link "{video.link.split(".")[0]}" stop sharring.')

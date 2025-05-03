@@ -5,11 +5,9 @@ services:
     container_name: vhub-mysql
     networks:
       vhub_net:
-        ipv4_address: 172.28.1.4
+        ipv4_address: 172.28.1.2
     volumes:
       - /opt/vhub-data-mysql:/var/lib/mysql
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: vhub-mysql
 
@@ -22,9 +20,6 @@ services:
         ipv4_address: 172.28.1.3
     volumes:
       - /opt/vhub-data-minio:/bitnami/minio/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     environment:
       MINIO_ROOT_USER: vhub-minio
       MINIO_ROOT_PASSWORD: vhub-minio
@@ -36,9 +31,10 @@ services:
     container_name: vhub-app
     networks:
       vhub_net:
-        ipv4_address: 172.28.1.2
+        ipv4_address: 172.28.1.4
     volumes:
       - /opt/vhub-app/logs:/app/logs
+      - /opt/vhub-app/config.ini:/app/config.ini
     depends_on:
       - vhub-minio
       - vhub-mysql
@@ -49,7 +45,7 @@ services:
     container_name: vhub-nginx
     networks:
       vhub_net:
-        ipv4_address: 172.28.1.1
+        ipv4_address: 172.28.1.5
     ports:
       - "80:80"
       - "443:443"
@@ -65,3 +61,4 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
+          gateway: 172.28.1.1
